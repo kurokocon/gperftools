@@ -210,6 +210,11 @@ DEFINE_int64(tcmalloc_large_alloc_report_threshold,
              "is very large and therefore you should see no extra "
              "logging unless the flag is overridden.  Set to 0 to "
              "disable reporting entirely.");
+DEFINE_int64(tcmalloc_large_alloc_report_stack_depth,
+             EnvToInt64("TCMALLOC_LARGE_ALLOC_REPORT_STACK_DEPTH",
+                        1),
+             "When reporting large alloc, max stack trace depth may"
+             "be configured with this value.");
 
 
 // We already declared these functions in tcmalloc.h, but we have to
@@ -1292,7 +1297,7 @@ static void ReportLargeAlloc(Length num_pages, void* result) {
 
   static const int N = 1000;
   char buffer[N];
-  TCMalloc_Printer printer(buffer, N);
+  TCMalloc_Printer printer(buffer, FLAGS_tcmalloc_large_alloc_report_stack_depth);
   printer.printf("tcmalloc: large alloc %" PRIu64 " bytes == %p @ ",
                  static_cast<uint64>(num_pages) << kPageShift,
                  result);
